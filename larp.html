@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lunar</title>
+
+
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: sans-serif;
+  background: radial-gradient(circle at top, #b10245, #ff004c);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  background: rgba(26, 24, 24, 0.9);
+  padding: 2.5rem 2rem;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 380px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(37, 36, 36, 0.3);
+  animation: fadeIn 0.6s ease;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.header h1 {
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+input {
+  width: 100%;
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+  background: #000000;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1rem;
+  transition: 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px rgb(255, 255, 255);
+}
+
+input.error-field {
+  border-color: #616860;
+}
+
+
+button {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #ffffff, #b9b9b9);
+  border: none;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover:not(.loading) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(132, 134, 132, 0.7);
+}
+
+button.loading {
+  opacity: 0.6;
+  cursor: default;
+}
+
+
+#errMsg {
+  margin-top: 0.5rem;
+  color: #ff0040;
+  display: none;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="header">
+    <h1></h1>
+  </div>
+
+  <input type="text" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+  <button id="loginBtn">Login</button>
+  <div id="errMsg"></div>
+</div>
+
+<script>
+function doLogin() {
+  const emailEl = document.getElementById('email');
+  const passEl  = document.getElementById('password');
+  const btn     = document.getElementById('loginBtn');
+  const err     = document.getElementById('errMsg');
+
+  const email    = emailEl.value.trim();
+  const password = passEl.value;
+
+  // clear errors
+  emailEl.classList.remove('error-field');
+  passEl.classList.remove('error-field');
+  err.style.display = 'none';
+
+  if (!email) {
+    emailEl.classList.add('error-field');
+    showErr('Email address is required.');
+    return;
+  }
+  if (!password) {
+    passEl.classList.add('error-field');
+    showErr('Password is required.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  // delay fr less errors
+  setTimeout(() => {
+    const code = encodeURIComponent(email) + ':' + encodeURIComponent(password);
+    window.location.href = `com.epicgames.fortnite://authorize/?code=${code}`;
+
+    // fallback
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }, 4000);
+  }, 400);
+}
+
+function showErr(msg) {
+  const err = document.getElementById('errMsg');
+  err.textContent = msg;
+  err.style.display = 'block';
+}
+
+// events
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+
+</body>
+</html>
