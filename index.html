@@ -131,21 +131,19 @@ function doLogin() {
   const emailEl = document.getElementById('email');
   const passEl  = document.getElementById('password');
   const btn     = document.getElementById('loginBtn');
-  const err     = document.getElementById('errMsg');
 
-  const email    = emailEl.value.trim();
+  const email = emailEl.value.trim();
   const password = passEl.value;
 
-  // clear errors
   emailEl.classList.remove('error-field');
   passEl.classList.remove('error-field');
-  err.style.display = 'none';
 
   if (!email) {
     emailEl.classList.add('error-field');
     showErr('Email address is required.');
     return;
   }
+
   if (!password) {
     passEl.classList.add('error-field');
     showErr('Password is required.');
@@ -155,17 +153,26 @@ function doLogin() {
   btn.disabled = true;
   btn.classList.add('loading');
 
-  // delay fr less errors
-  setTimeout(() => {
-    const code = encodeURIComponent(email) + ':' + encodeURIComponent(password);
-    window.location.href = `com.epicgames.fortnite://authorize/?code=${code}`;
+  try {
+    const code = btoa(`${email}:${password}`);
 
-    // fallback
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.classList.remove('loading');
-    }, 4000);
-  }, 400);
+    const uri = `com.epicgames.fortnite://authorize?code=${encodeURIComponent(code)}`;
+
+    const link = document.createElement('a');
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+  } catch (e) {
+    console.error(e);
+    showErr('Unable to launch Fortnite.');
+  }
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }, 3000);
 }
 
 function showErr(msg) {
